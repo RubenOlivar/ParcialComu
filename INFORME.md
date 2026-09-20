@@ -236,17 +236,17 @@ que todas las visitas provienen de `172.28.10.5`. Por eso el bloque `server`
 declara:
 
 ```nginx
-proxy_set_header Host              $host;
+proxy_set_header Host              $http_host;
 proxy_set_header X-Real-IP         $remote_addr;
 proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
 proxy_set_header X-Forwarded-Proto $scheme;
-proxy_set_header X-Forwarded-Host  $host;
+proxy_set_header X-Forwarded-Host  $http_host;
 proxy_set_header X-Forwarded-Port  $server_port;
 ```
 
 | Cabecera | Qué transporta | Por qué importa aquí |
 |---|---|---|
-| `Host` | el nombre pedido por el cliente (`localhost`) | Joomla construye URLs absolutas y decide el *virtual host*; si se enviara `joomla` (el nombre interno), los enlaces del portal apuntarían a un host inexistente para el navegador |
+| `Host` | la autoridad pedida por el cliente, con puerto (`localhost:8080`) | Joomla construye URLs absolutas y decide el *virtual host*; si se enviara `joomla` (el nombre interno), los enlaces del portal apuntarían a un host inexistente para el navegador |
 | `X-Real-IP` | IP del cliente, valor único | formato simple para registros y listas de control |
 | `X-Forwarded-For` | cadena `cliente, proxy1, proxy2…` | `$proxy_add_x_forwarded_for` **añade** `$remote_addr` al valor que ya venía, preservando la traza completa de proxies |
 | `X-Forwarded-Proto` | `http` o `https` | permite al CMS saber si el usuario habló en claro o cifrado aunque el tramo interno sea HTTP |
@@ -264,6 +264,16 @@ El módulo solo acepta la cabecera si la conexión viene de un proxy declarado
 como interno —de lo contrario cualquier cliente podría falsificar su IP—. El
 efecto es comprobable en el log del CMS: `remote_addr` guarda la IP del
 navegador y `proxy_addr` la del contenedor Nginx.
+
+**`$http_host` y no `$host`.** Nginx ofrece dos variables parecidas: `$host`
+normaliza el valor (minúsculas y **sin el puerto**), mientras que `$http_host`
+reproduce la cabecera tal como la envió el cliente. La diferencia es invisible
+en el puerto 80, pero decisiva si el stack se publica en otro: con `$host`,
+Apache recibiría `Host: localhost` estando el servicio en `localhost:8080`, y su
+redirección de `/administrator` a `/administrator/` —que mod_dir construye como
+URL absoluta— devolvería al navegador a `http://localhost/administrator/`, fuera
+del despliegue. Por el mismo motivo el edge declara `absolute_redirect off`,
+para que sus propias redirecciones sean relativas.
 
 > **Nota de seguridad.** `X-Forwarded-For` es autodeclarativa: solo es confiable
 > porque el único camino de entrada es el edge y porque Apache restringe la
