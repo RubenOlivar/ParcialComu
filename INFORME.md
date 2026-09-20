@@ -275,6 +275,17 @@ URL absoluta— devolvería al navegador a `http://localhost/administrator/`, fu
 del despliegue. Por el mismo motivo el edge declara `absolute_redirect off`,
 para que sus propias redirecciones sean relativas.
 
+**Herencia de `proxy_set_header` en Nginx.** Las directivas de este tipo se
+heredan del bloque `server` **solo si el `location` no declara ninguna**: basta
+con añadir una para que se descarten todas las heredadas. Como `/jupyter/` y
+`/grafana/` necesitan declarar `Upgrade` y `Connection` para los WebSockets,
+perdían el resto del conjunto y recibían el `Host` por defecto de Nginx, que es
+el nombre del upstream (`grafana`, `jupyter`). El síntoma fue elocuente: con una
+sesión iniciada, Grafana comparaba el `Origin` del navegador
+(`http://localhost:8080`) contra ese `Host` y respondía **403 `origin not
+allowed`** a los recursos estáticos y al WebSocket de Grafana Live. Por eso el
+conjunto completo de cabeceras se repite dentro de cada `location`.
+
 > **Nota de seguridad.** `X-Forwarded-For` es autodeclarativa: solo es confiable
 > porque el único camino de entrada es el edge y porque Apache restringe la
 > confianza a los dos bridges del despliegue.
