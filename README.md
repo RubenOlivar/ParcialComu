@@ -77,6 +77,11 @@ puertos.
 Las credenciales se definen en `.env.example`; cámbielas allí si desea otras
 antes de desplegar.
 
+> Si el puerto 80 está ocupado, basta con poner `HTTP_PORT=8080` en `.env`: el
+> stack completo queda en <http://localhost:8080/> (portal, `/jupyter/` y
+> `/grafana/` incluidos). El edge emite redirecciones relativas, de modo que el
+> puerto publicado se conserva en toda la navegación.
+
 ---
 
 ## 4. Verificación rápida
