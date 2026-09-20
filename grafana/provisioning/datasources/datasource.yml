@@ -11,10 +11,10 @@
 # =============================================================================
 apiVersion: 1
 
-# Limpia definiciones previas con el mismo nombre (despliegues repetidos).
-deleteDatasources:
-  - name: PostgreSQL-Observabilidad
-    orgId: 1
+# Nota: no se declara 'deleteDatasources'. El datasource se identifica por un
+# uid fijo, asi que cada arranque lo actualiza en su sitio; borrarlo primero
+# abriria una ventana de unos segundos en la que los paneles ya abiertos en un
+# navegador consultarian un origen inexistente y mostrarian error.
 
 datasources:
   - name: PostgreSQL-Observabilidad
