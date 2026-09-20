@@ -49,4 +49,4 @@ for ($i = 1; $i -le $Vueltas; $i++) {
 
 Write-Host ""
 Write-Host "Listo: $total peticiones enviadas."
-Write-Host "Abra http://localhost/grafana/ para ver los paneles actualizados."
+Write-Host "Abra $Base/grafana/ para ver los paneles actualizados."

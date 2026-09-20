@@ -91,9 +91,12 @@ Versión en texto plano (por si el visor no renderiza Mermaid):
 | 4 | `jupyter` | build sobre `jupyter/base-notebook` | frontend (172.28.10.2) + backend (172.28.20.4) | 8888/tcp | no | bind-mount `./jupyter/notebooks` → `/home/jovyan/work`, logs (ro) |
 | 5 | `grafana` | `grafana/grafana:latest` (13.2.2) | frontend (172.28.10.4) + backend (172.28.20.3) | 3000/tcp | no | `grafana_data`, `./grafana/provisioning` (ro) |
 
-Las direcciones provienen de `docker network inspect`; los rangos están fijados
-en `docker-compose.yml` mediante bloques `ipam`, de modo que se repiten
-idénticos en cualquier máquina.
+Las direcciones no son casuales: `docker-compose.yml` fija las subredes con
+bloques `ipam` y asigna a cada servicio su `ipv4_address`. Sin eso, Docker las
+reparte por orden de arranque y cambiarían en cada despliegue. Así, cualquier
+`docker network inspect` sobre este proyecto —en cualquier máquina— devuelve
+exactamente las direcciones de esta tabla, y las capturas que siguen son
+reproducibles.
 
 ## 1.3 Mecanismo de recolección: ¿cómo llegan los eventos a Grafana?
 
@@ -644,13 +647,25 @@ el otro.
 Estado real del despliegue:
 
 ```bash
-$ for b in /sys/class/net/br-*; do echo "$(basename $b) → $(ls $b/brif)"; done
+$ docker run --rm --net=host --privileged alpine sh -c \
+    'for b in /sys/class/net/br-*; do
+       echo "$(basename $b)  mac=$(cat $b/address)  miembros: $(ls $b/brif)"
+     done'
 br-626404bc3251  mac=ca:02:54:f5:98:5b  miembros: veth15caeff veth3dc232a veth5286d34 vethfc3eb47
 br-0cbca46fa54f  mac=2e:98:f3:9f:e6:f0  miembros: veth4d3d165 veth50934c0 veth6106c7d veth8444407
 ```
 
 Cuatro `veth` por bridge, coincidiendo exactamente con los cuatro contenedores
-de cada red. El bridge es un **conmutador Ethernet por software**: mantiene una
+de cada red.
+
+> **Sobre los nombres `br-…` y `veth…`:** el sufijo del bridge son los primeros
+> doce caracteres del identificador que Docker asigna a la red al crearla, y los
+> `veth` reciben un sufijo aleatorio. Ambos cambian en cada `docker compose up`
+> que recree las redes, así que en otra máquina serán distintos de los de esta
+> captura. Para correlacionarlos:
+> `docker network inspect parcial2_frontend_net -f 'br-{{slice .Id 0 12}}'`.
+> Lo que sí es idéntico en cualquier despliegue son las subredes y las IP,
+> porque están fijadas en `docker-compose.yml`. El bridge es un **conmutador Ethernet por software**: mantiene una
 tabla de MAC aprendidas por puerto e inunda solo las tramas de difusión o de
 destino desconocido. Cada bridge es, por tanto, un **dominio de difusión
 independiente**, y esa es la frontera física —en términos virtuales— entre
@@ -697,9 +712,13 @@ Tres observaciones:
 * Las direcciones MAC comienzan por bytes con el bit *locally administered*
   activo; son generadas por Docker, no asignadas por un fabricante.
 
-Un `docker compose down && up` cambia todas las MAC y posiblemente las IP; el
-sistema sigue funcionando porque ninguna configuración las menciona: ARP y el
-DNS interno reconstruyen el mapa completo en cada arranque.
+Un `docker compose down && up` genera **MAC nuevas** en todas las interfaces
+—Docker las crea al vuelo con el bit *locally administered*—, mientras que las
+IP se repiten porque están fijadas en el Compose. Aun así, ninguna configuración
+de las aplicaciones menciona direcciones: Nginx habla de `joomla`, Grafana de
+`database` y el cuaderno de `database`. ARP reconstruye el mapa de enlace y el
+DNS interno el de red en cada arranque; las IP fijas son una comodidad para que
+este informe sea verificable, no una dependencia del sistema.
 
 ---
 
@@ -758,6 +777,11 @@ powershell -File scripts\generar_trafico.ps1 -Vueltas 15   # Windows
 ```bash
 docker compose exec nginx tail -2 /var/log/nginx/shared/access.json.log
 ```
+
+> **Si evalúa desde Git Bash en Windows:** ese shell reescribe las rutas
+> absolutas del contenedor a rutas de Windows. Anteponga `MSYS_NO_PATHCONV=1`
+> a los comandos que lleven rutas como `/var/log/...` o `/tmp/...`. En Linux y
+> macOS no hace falta.
 
 ## 3.2 Grafana: los paneles reflejan el tráfico
 
@@ -828,11 +852,16 @@ docker compose exec jupyter jupyter nbconvert --to notebook --execute \
 ## 3.4 Comprobaciones específicas de red (opcional, para la sustentación)
 
 ```bash
-# WebSockets operativos: debe responder 101 Switching Protocols
-curl -i -s -o - -N --max-time 5 \
-  -H "Connection: Upgrade" -H "Upgrade: websocket" \
-  -H "Sec-WebSocket-Version: 13" -H "Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==" \
-  http://localhost/jupyter/api/kernels 2>/dev/null | head -1
+# WebSockets operativos: ambos deben responder 101 Switching Protocols.
+# (Ojo: /jupyter/api/kernels es un endpoint REST y responde 200; los dos de
+#  abajo si negocian el cambio de protocolo a traves del proxy.)
+for ruta in /jupyter/api/events/subscribe /grafana/api/live/ws; do
+  printf '%s -> ' "$ruta"
+  curl -i -s -N --max-time 5 \
+    -H "Connection: Upgrade" -H "Upgrade: websocket" \
+    -H "Sec-WebSocket-Version: 13" -H "Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==" \
+    -H "Origin: http://localhost" "http://localhost$ruta" 2>/dev/null | head -1
+done
 
 # Aislamiento de la base de datos
 docker compose exec nginx ping -c1 database          # bad address

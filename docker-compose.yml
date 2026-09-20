@@ -52,7 +52,8 @@ services:
       - edge_logs:/mnt/logs/edge:ro
       - joomla_logs:/mnt/logs/joomla:ro
     networks:
-      - backend_net
+      backend_net:
+        ipv4_address: 172.28.20.2
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB -h 127.0.0.1"]
       interval: 10s
@@ -98,8 +99,10 @@ services:
       # Formato de log JSON + confianza en el proxy (X-Forwarded-For)
       - ./joomla/apache/zz-observabilidad.conf:/etc/apache2/conf-enabled/zz-observabilidad.conf:ro,z
     networks:
-      - frontend_net
-      - backend_net
+      frontend_net:
+        ipv4_address: 172.28.10.3
+      backend_net:
+        ipv4_address: 172.28.20.5
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS -o /dev/null http://127.0.0.1/ || exit 1"]
       interval: 15s
@@ -150,8 +153,10 @@ services:
       - edge_logs:/home/jovyan/logs/edge:ro
       - joomla_logs:/home/jovyan/logs/joomla:ro
     networks:
-      - frontend_net
-      - backend_net
+      frontend_net:
+        ipv4_address: 172.28.10.2
+      backend_net:
+        ipv4_address: 172.28.20.4
 
   # ===========================================================================
   # 5) grafana - Monitoreo y dashboards aprovisionados de forma declarativa
@@ -178,6 +183,7 @@ services:
       GF_AUTH_BASIC_ENABLED: "true"
       # La pagina de inicio la resuelve Nginx redirigiendo /grafana/ al
       # dashboard aprovisionado (ver nginx/conf.d/default.conf).
+      #
       # Credenciales del datasource (interpoladas en datasource.yml)
       GRAFANA_DB_USER: ${GRAFANA_DB_USER:-grafana_ro}
       GRAFANA_DB_PASSWORD: ${GRAFANA_DB_PASSWORD:-Comm2026_GrafanaRO}
@@ -191,8 +197,10 @@ services:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro,z
     networks:
-      - frontend_net
-      - backend_net
+      frontend_net:
+        ipv4_address: 172.28.10.4
+      backend_net:
+        ipv4_address: 172.28.20.3
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:3000/grafana/api/health || exit 1"]
       interval: 15s
@@ -224,7 +232,8 @@ services:
       # Log de acceso JSON compartido con database (parseo SQL) y jupyter
       - edge_logs:/var/log/nginx/shared
     networks:
-      - frontend_net
+      frontend_net:
+        ipv4_address: 172.28.10.5
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/healthz || exit 1"]
       interval: 15s

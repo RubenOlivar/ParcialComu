@@ -38,4 +38,4 @@ done
 
 echo ""
 echo "Listo: ${total} peticiones enviadas."
-echo "Abra http://localhost/grafana/ para ver los paneles actualizados."
+echo "Abra ${BASE}/grafana/ para ver los paneles actualizados."
