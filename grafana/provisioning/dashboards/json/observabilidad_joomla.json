@@ -428,7 +428,7 @@
       "id": 6,
       "type": "timeseries",
       "title": "Peticiones por minuto, por clase de codigo HTTP",
-      "description": "Distribucion temporal de las respuestas del edge agrupadas en 2xx (exito), 3xx (redireccion), 4xx (error de cliente) y 5xx (error de servidor).",
+      "description": "Distribucion temporal de las respuestas del edge: 1xx (cambio de protocolo: handshakes WebSocket del kernel de Jupyter y de Grafana Live), 2xx (exito), 3xx (redireccion), 4xx (error de cliente) y 5xx (error de servidor).",
       "gridPos": {
         "h": 9,
         "w": 12,
@@ -471,6 +471,21 @@
           "mappings": []
         },
         "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "1xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#9085e9"
+                }
+              }
+            ]
+          },
           {
             "matcher": {
               "id": "byName",
