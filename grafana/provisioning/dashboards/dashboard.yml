@@ -1,0 +1,21 @@
+# =============================================================================
+#  Aprovisionamiento declarativo de dashboards - Parcial 2 Comunicaciones
+#  Ruta en el contenedor: /etc/grafana/provisioning/dashboards/dashboard.yml
+#
+#  Todos los .json del directorio indicado se cargan al iniciar Grafana, por lo
+#  que los paneles existen antes de que nadie abra la interfaz.
+# =============================================================================
+apiVersion: 1
+
+providers:
+  - name: parcial2-comunicaciones
+    orgId: 1
+    folder: Parcial 2 - Comunicaciones
+    folderUid: parcial2
+    type: file
+    disableDeletion: false
+    allowUiUpdates: true
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/provisioning/dashboards/json
+      foldersFromFilesStructure: false

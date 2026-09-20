@@ -1,0 +1,269 @@
+# =============================================================================
+#  Parcial 2 practico: despliegue multi-contenedor, orquestacion,
+#  arquitectura y analisis del modelo OSI
+#  Comunicaciones - Ingenieria Mecatronica - Universidad Militar Nueva Granada
+#
+#  Despliegue completo (zero-touch):  cp .env.example .env && docker compose up -d
+#  Unico puerto publicado al host: 80/tcp (contenedor nginx).
+# =============================================================================
+name: parcial2-comunicaciones
+
+# ---- Ancla reutilizable de logging ------------------------------------------
+x-logging: &logging-default
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+
+  # ===========================================================================
+  # 3) database - PostgreSQL 16 (motor relacional obligatorio)
+  #    Capa 4: escucha TCP/5432.  Capa 3: SOLO en backend_net (red interna,
+  #    sin ruta hacia el exterior ni publicacion de puertos en el host).
+  # ===========================================================================
+  database:
+    image: postgres:16-alpine
+    container_name: comm_database
+    hostname: database
+    restart: unless-stopped
+    logging: *logging-default
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-joomladb}
+      POSTGRES_USER: ${POSTGRES_USER:-joomla}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Comm2026_Postgres}
+      # Rol de solo lectura consumido por Grafana (creado en 02-rol-grafana.sh)
+      GRAFANA_DB_USER: ${GRAFANA_DB_USER:-grafana_ro}
+      GRAFANA_DB_PASSWORD: ${GRAFANA_DB_PASSWORD:-Comm2026_GrafanaRO}
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+      TZ: ${TZ:-America/Bogota}
+      PGTZ: ${TZ:-America/Bogota}
+    volumes:
+      # Persistencia del cluster (volumen nombrado, requisito del enunciado)
+      - pgdata:/var/lib/postgresql/data
+      # Scripts de inicializacion: esquema de observabilidad + rol de Grafana
+      - ./database/initdb:/docker-entrypoint-initdb.d:ro
+      # Logs compartidos en SOLO LECTURA: el motor los parsea y los publica
+      # como vistas SQL que Grafana consulta (ver INFORME.md, seccion 1).
+      - edge_logs:/mnt/logs/edge:ro
+      - joomla_logs:/mnt/logs/joomla:ro
+    networks:
+      - backend_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB -h 127.0.0.1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  # ===========================================================================
+  # 2) joomla - CMS institucional (Apache + PHP, Capa 7)
+  #    Doble homing: frontend_net (recibe del proxy) + backend_net (habla SQL).
+  #    Publica su access log en formato JSON sobre el volumen joomla_logs.
+  # ===========================================================================
+  joomla:
+    image: joomla:latest
+    container_name: comm_joomla
+    hostname: joomla
+    restart: unless-stopped
+    logging: *logging-default
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      # --- Conexion al motor relacional PostgreSQL ---
+      JOOMLA_DB_TYPE: ${JOOMLA_DB_TYPE:-pgsql}
+      JOOMLA_DB_HOST: database
+      JOOMLA_DB_PORT: "5432"
+      JOOMLA_DB_NAME: ${POSTGRES_DB:-joomladb}
+      JOOMLA_DB_USER: ${POSTGRES_USER:-joomla}
+      JOOMLA_DB_PASSWORD: ${POSTGRES_PASSWORD:-Comm2026_Postgres}
+      JOOMLA_DB_PREFIX: ${JOOMLA_DB_PREFIX:-joom_}
+      # --- Instalacion desatendida del portal (sin asistente web) ---
+      JOOMLA_SITE_NAME: ${JOOMLA_SITE_NAME:-Portal Institucional UMNG - Comunicaciones}
+      JOOMLA_ADMIN_USER: ${JOOMLA_ADMIN_USER:-Administrador UMNG}
+      JOOMLA_ADMIN_USERNAME: ${JOOMLA_ADMIN_USERNAME:-administrador}
+      JOOMLA_ADMIN_PASSWORD: ${JOOMLA_ADMIN_PASSWORD:-Comm2026_Joomla_Admin}
+      JOOMLA_ADMIN_EMAIL: ${JOOMLA_ADMIN_EMAIL:-admin@umng.local}
+      TZ: ${TZ:-America/Bogota}
+    volumes:
+      # Assets del CMS en volumen nombrado (persistencia entre reinicios)
+      - joomla_data:/var/www/html
+      # Directorio de logs de Apache compartido con database/jupyter
+      - joomla_logs:/var/log/apache2
+      # Formato de log JSON + confianza en el proxy (X-Forwarded-For)
+      - ./joomla/apache/zz-observabilidad.conf:/etc/apache2/conf-enabled/zz-observabilidad.conf:ro
+    networks:
+      - frontend_net
+      - backend_net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -o /dev/null http://127.0.0.1/ || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+      start_period: 90s
+
+  # ===========================================================================
+  # 4) jupyter - Entorno de ciencia de datos (cuaderno precargado)
+  #    Imagen derivada de jupyter/base-notebook con pandas/matplotlib/psycopg2.
+  #    Esta en backend_net porque el cuaderno consulta PostgreSQL (requisito
+  #    del enunciado: "consultar tablas de la base de datos PostgreSQL").
+  # ===========================================================================
+  jupyter:
+    build:
+      context: ./jupyter
+      dockerfile: Dockerfile
+    image: parcial2-comunicaciones/jupyter-analitica:1.0
+    container_name: comm_jupyter
+    hostname: jupyter
+    restart: unless-stopped
+    logging: *logging-default
+    # Arranca como root solo para ajustar permisos del bind-mount; el script
+    # de la imagen degrada privilegios al usuario jovyan (UID 1000).
+    user: root
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      NB_UID: "1000"
+      NB_GID: "100"
+      CHOWN_EXTRA: "/home/jovyan/work"
+      CHOWN_EXTRA_OPTS: "-R"
+      JUPYTER_ENABLE_LAB: "yes"
+      # Parametros de conexion usados por el cuaderno analisis_datos.ipynb
+      POSTGRES_HOST: database
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB:-joomladb}
+      POSTGRES_USER: ${POSTGRES_USER:-joomla}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Comm2026_Postgres}
+      # Punto de entrada HTTP para la celda generadora de trafico
+      EDGE_URL: http://nginx
+      TZ: ${TZ:-America/Bogota}
+    volumes:
+      # Bind-mount del repositorio: el cuaderno queda precargado al desplegar
+      - ./jupyter/notebooks:/home/jovyan/work
+      # Logs crudos disponibles para procesamiento con pandas (solo lectura)
+      - edge_logs:/home/jovyan/logs/edge:ro
+      - joomla_logs:/home/jovyan/logs/joomla:ro
+    networks:
+      - frontend_net
+      - backend_net
+
+  # ===========================================================================
+  # 5) grafana - Monitoreo y dashboards aprovisionados de forma declarativa
+  #    Datasource + dashboard se cargan desde /etc/grafana/provisioning.
+  # ===========================================================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: comm_grafana
+    hostname: grafana
+    restart: unless-stopped
+    logging: *logging-default
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD:-Comm2026_Grafana}
+      # Servido bajo el subpath /grafana/ detras del proxy inverso
+      GF_SERVER_ROOT_URL: http://${PUBLIC_HOST:-localhost}/grafana/
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      # Acceso anonimo de solo lectura: el evaluador ve los paneles sin login
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_AUTH_BASIC_ENABLED: "true"
+      # La pagina de inicio la resuelve Nginx redirigiendo /grafana/ al
+      # dashboard aprovisionado (ver nginx/conf.d/default.conf).
+      # Credenciales del datasource (interpoladas en datasource.yml)
+      GRAFANA_DB_USER: ${GRAFANA_DB_USER:-grafana_ro}
+      GRAFANA_DB_PASSWORD: ${GRAFANA_DB_PASSWORD:-Comm2026_GrafanaRO}
+      POSTGRES_DB: ${POSTGRES_DB:-joomladb}
+      # Despliegue offline-friendly: sin telemetria ni chequeo de versiones
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_NEWS_NEWS_FEED_ENABLED: "false"
+      TZ: ${TZ:-America/Bogota}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    networks:
+      - frontend_net
+      - backend_net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:3000/grafana/api/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ===========================================================================
+  # 1) nginx - Edge router / proxy inverso (UNICO contenedor con puerto al host)
+  #    Enruta por prefijo:  /  -> joomla | /jupyter -> jupyter | /grafana -> grafana
+  #    Centraliza el registro de accesos en formato JSON (volumen edge_logs).
+  # ===========================================================================
+  nginx:
+    image: nginx:alpine
+    container_name: comm_nginx
+    hostname: nginx
+    restart: unless-stopped
+    logging: *logging-default
+    depends_on:
+      - joomla
+      - jupyter
+      - grafana
+    ports:
+      - "${HTTP_PORT:-80}:80"
+    environment:
+      TZ: ${TZ:-America/Bogota}
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      # Log de acceso JSON compartido con database (parseo SQL) y jupyter
+      - edge_logs:/var/log/nginx/shared
+    networks:
+      - frontend_net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/healthz || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+# =============================================================================
+#  Redes (Capa 2 / Capa 3): dos bridges Docker independientes
+# =============================================================================
+networks:
+  # Segmento de borde: proxy <-> aplicaciones. Tiene NAT/salida hacia el host.
+  frontend_net:
+    name: parcial2_frontend_net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.10.0/24
+          gateway: 172.28.10.1
+
+  # Segmento de datos: aplicaciones <-> PostgreSQL.
+  # internal: true => el kernel del host NO instala reglas de MASQUERADE para
+  # este bridge, por lo que 'database' carece de ruta hacia el exterior.
+  backend_net:
+    name: parcial2_backend_net
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.28.20.0/24
+          gateway: 172.28.20.1
+
+# =============================================================================
+#  Volumenes
+# =============================================================================
+volumes:
+  pgdata:          # /var/lib/postgresql/data   (persistencia del motor)
+    name: parcial2_pgdata
+  joomla_data:     # /var/www/html              (assets del CMS)
+    name: parcial2_joomla_data
+  grafana_data:    # /var/lib/grafana           (estado interno de Grafana)
+    name: parcial2_grafana_data
+  edge_logs:       # access log JSON de Nginx   (nginx rw -> database/jupyter ro)
+    name: parcial2_edge_logs
+  joomla_logs:     # /var/log/apache2 de Joomla (joomla rw -> database/jupyter ro)
+    name: parcial2_joomla_logs

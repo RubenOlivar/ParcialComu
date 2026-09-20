@@ -1,0 +1,14 @@
+# Normaliza finales de linea: los contenedores Linux ejecutan estos archivos y
+# un clon en Windows con core.autocrlf=true los rompería (CRLF en un script sh
+# hace fallar la inicializacion de PostgreSQL).
+* text=auto eol=lf
+
+*.sh   text eol=lf
+*.conf text eol=lf
+*.yml  text eol=lf
+*.sql  text eol=lf
+*.ps1  text eol=crlf
+
+*.ipynb text eol=lf
+*.png  binary
+*.jpg  binary

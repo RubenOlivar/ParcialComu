@@ -1,0 +1,13 @@
+# Variables reales de despliegue (se genera con: cp .env.example .env)
+.env
+
+# Artefactos locales de Jupyter
+jupyter/notebooks/.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+__pycache__/
+
+# Sistema operativo / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
