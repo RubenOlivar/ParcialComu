@@ -210,8 +210,8 @@ docker compose up -d --build           # reconstruir tras cambiar el Dockerfile
 
 ## 9. Integrantes
 
-| Nombre | Código |
-|---|---|
-| *(completar)* | *(completar)* |
-| *(completar)* | *(completar)* |
-| *(completar)* | *(completar)* |
+| Nombre |
+|---|
+| Rubén Olivar |
+| Nicolás Bernal |
+| Juan Castilla |
