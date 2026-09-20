@@ -2,19 +2,38 @@
   "uid": "parcial2-observabilidad",
   "title": "Observabilidad del portal Joomla (edge Nginx + PostgreSQL)",
   "description": "Paneles aprovisionados automaticamente. Todas las series provienen de las vistas SQL del esquema 'observabilidad', que parsean los access logs JSON de Nginx y de Apache/Joomla, mas las estadisticas del propio motor PostgreSQL.",
-  "tags": ["parcial2", "comunicaciones", "umng", "joomla", "nginx"],
+  "tags": [
+    "parcial2",
+    "comunicaciones",
+    "umng",
+    "joomla",
+    "nginx"
+  ],
   "timezone": "browser",
   "editable": true,
   "graphTooltip": 1,
   "schemaVersion": 39,
   "version": 1,
   "refresh": "30s",
-  "time": { "from": "now-1h", "to": "now" },
-  "timepicker": {
-    "refresh_intervals": ["10s", "30s", "1m", "5m", "15m"]
+  "time": {
+    "from": "now-1h",
+    "to": "now"
   },
-  "annotations": { "list": [] },
-  "templating": { "list": [] },
+  "timepicker": {
+    "refresh_intervals": [
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m"
+    ]
+  },
+  "annotations": {
+    "list": []
+  },
+  "templating": {
+    "list": []
+  },
   "links": [],
   "panels": [
     {
@@ -22,11 +41,22 @@
       "type": "stat",
       "title": "Peticiones atendidas por el edge",
       "description": "Total de peticiones HTTP registradas por Nginx en el rango seleccionado.",
-      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "pg_observabilidad"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "fixed", "fixedColor": "#3987e5" },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#3987e5"
+          },
           "unit": "short",
           "decimals": 0,
           "mappings": []
@@ -34,7 +64,13 @@
         "overrides": []
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "orientation": "auto",
         "textMode": "auto",
         "colorMode": "value",
@@ -44,7 +80,10 @@
       "targets": [
         {
           "refId": "A",
-          "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "pg_observabilidad"
+          },
           "editorMode": "code",
           "rawQuery": true,
           "format": "table",
@@ -57,21 +96,40 @@
       "type": "stat",
       "title": "Tasa de respuestas con error (>= 400)",
       "description": "Porcentaje de peticiones respondidas con codigo 4xx o 5xx.",
-      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "pg_observabilidad"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
           "decimals": 1,
           "min": 0,
           "max": 100,
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "#0ca30c", "value": null },
-              { "color": "#fab219", "value": 5 },
-              { "color": "#d03b3b", "value": 20 }
+              {
+                "color": "#0ca30c",
+                "value": null
+              },
+              {
+                "color": "#fab219",
+                "value": 5
+              },
+              {
+                "color": "#d03b3b",
+                "value": 20
+              }
             ]
           },
           "mappings": []
@@ -79,7 +137,13 @@
         "overrides": []
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "orientation": "auto",
         "textMode": "auto",
         "colorMode": "value",
@@ -89,7 +153,10 @@
       "targets": [
         {
           "refId": "A",
-          "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "pg_observabilidad"
+          },
           "editorMode": "code",
           "rawQuery": true,
           "format": "table",
@@ -102,11 +169,22 @@
       "type": "stat",
       "title": "Clientes distintos (IP)",
       "description": "Direcciones IP de origen unicas vistas por el proxy inverso.",
-      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "pg_observabilidad"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "fixed", "fixedColor": "#199e70" },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#199e70"
+          },
           "unit": "short",
           "decimals": 0,
           "mappings": []
@@ -114,7 +192,13 @@
         "overrides": []
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "orientation": "auto",
         "textMode": "auto",
         "colorMode": "value",
@@ -124,7 +208,10 @@
       "targets": [
         {
           "refId": "A",
-          "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "pg_observabilidad"
+          },
           "editorMode": "code",
           "rawQuery": true,
           "format": "table",
@@ -137,11 +224,22 @@
       "type": "stat",
       "title": "Sesiones abiertas en PostgreSQL",
       "description": "Conexiones TCP/5432 activas contra la base del CMS (pg_stat_database).",
-      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "pg_observabilidad"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "fixed", "fixedColor": "#d95926" },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#d95926"
+          },
           "unit": "short",
           "decimals": 0,
           "mappings": []
@@ -149,7 +247,13 @@
         "overrides": []
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "orientation": "auto",
         "textMode": "auto",
         "colorMode": "value",
@@ -159,7 +263,10 @@
       "targets": [
         {
           "refId": "A",
-          "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "pg_observabilidad"
+          },
           "editorMode": "code",
           "rawQuery": true,
           "format": "table",
@@ -172,14 +279,24 @@
       "type": "timeseries",
       "title": "Peticiones por minuto, por servicio enrutado",
       "description": "Volumen de trafico que el edge Nginx entrega a cada backend (/ -> joomla, /jupyter -> jupyter, /grafana -> grafana). 'edge' corresponde a las sondas de salud del propio proxy.",
-      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 4 },
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 4
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "pg_observabilidad"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
           "decimals": 0,
           "min": 0,
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "drawStyle": "bars",
             "barAlignment": 0,
@@ -191,42 +308,115 @@
             "axisLabel": "peticiones / min",
             "axisPlacement": "auto",
             "axisSoftMin": 0,
-            "stacking": { "mode": "normal", "group": "A" },
-            "hideFrom": { "legend": false, "tooltip": false, "viz": false }
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            },
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
           },
           "mappings": []
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "joomla" },
-            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "#3987e5" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "joomla"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#3987e5"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byName", "options": "jupyter" },
-            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "#d95926" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "jupyter"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#d95926"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byName", "options": "grafana" },
-            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "#199e70" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "grafana"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#199e70"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byName", "options": "edge" },
-            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "#898781" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "edge"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#898781"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byName", "options": "otros" },
-            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "#9085e9" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "otros"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#9085e9"
+                }
+              }
+            ]
           }
         ]
       },
       "options": {
-        "legend": { "showLegend": true, "displayMode": "list", "placement": "bottom", "calcs": [] },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "targets": [
         {
           "refId": "A",
-          "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "pg_observabilidad"
+          },
           "editorMode": "code",
           "rawQuery": true,
           "format": "time_series",
@@ -239,14 +429,24 @@
       "type": "timeseries",
       "title": "Peticiones por minuto, por clase de codigo HTTP",
       "description": "Distribucion temporal de las respuestas del edge agrupadas en 2xx (exito), 3xx (redireccion), 4xx (error de cliente) y 5xx (error de servidor).",
-      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 4 },
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 4
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "pg_observabilidad"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
           "decimals": 0,
           "min": 0,
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "drawStyle": "bars",
             "barAlignment": 0,
@@ -258,38 +458,100 @@
             "axisLabel": "respuestas / min",
             "axisPlacement": "auto",
             "axisSoftMin": 0,
-            "stacking": { "mode": "normal", "group": "A" },
-            "hideFrom": { "legend": false, "tooltip": false, "viz": false }
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            },
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
           },
           "mappings": []
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "2xx" },
-            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "#0ca30c" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "2xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#0ca30c"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byName", "options": "3xx" },
-            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "#3987e5" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "3xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#3987e5"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byName", "options": "4xx" },
-            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "#fab219" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "4xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#fab219"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byName", "options": "5xx" },
-            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "#d03b3b" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "5xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#d03b3b"
+                }
+              }
+            ]
           }
         ]
       },
       "options": {
-        "legend": { "showLegend": true, "displayMode": "list", "placement": "bottom", "calcs": [] },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "targets": [
         {
           "refId": "A",
-          "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "pg_observabilidad"
+          },
           "editorMode": "code",
           "rawQuery": true,
           "format": "time_series",
@@ -302,14 +564,24 @@
       "type": "timeseries",
       "title": "Latencia de respuesta del edge (p50 y p95)",
       "description": "Tiempo total de la peticion medido por Nginx ($request_time), en segundos. Ambas series comparten el mismo eje.",
-      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 13 },
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 13
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "pg_observabilidad"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "s",
           "decimals": 3,
           "min": 0,
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "drawStyle": "line",
             "lineWidth": 2,
@@ -322,30 +594,70 @@
             "axisLabel": "segundos",
             "axisPlacement": "auto",
             "axisSoftMin": 0,
-            "stacking": { "mode": "none", "group": "A" },
-            "hideFrom": { "legend": false, "tooltip": false, "viz": false }
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
           },
           "mappings": []
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "p50" },
-            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "#3987e5" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "p50"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#3987e5"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byName", "options": "p95" },
-            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "#d95926" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "p95"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#d95926"
+                }
+              }
+            ]
           }
         ]
       },
       "options": {
-        "legend": { "showLegend": true, "displayMode": "list", "placement": "bottom", "calcs": [] },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "targets": [
         {
           "refId": "A",
-          "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "pg_observabilidad"
+          },
           "editorMode": "code",
           "rawQuery": true,
           "format": "time_series",
@@ -358,14 +670,25 @@
       "type": "timeseries",
       "title": "Peticiones servidas por Apache/Joomla",
       "description": "Lineas del access log JSON que genera el propio contenedor del CMS (/var/log/apache2/joomla_access.json.log). Confirma el camino log -> volumen compartido -> PostgreSQL -> Grafana.",
-      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 13 },
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 13
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "pg_observabilidad"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
           "decimals": 0,
           "min": 0,
-          "color": { "mode": "fixed", "fixedColor": "#3987e5" },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#3987e5"
+          },
           "custom": {
             "drawStyle": "bars",
             "barAlignment": 0,
@@ -377,21 +700,39 @@
             "axisLabel": "peticiones / min",
             "axisPlacement": "auto",
             "axisSoftMin": 0,
-            "stacking": { "mode": "none", "group": "A" },
-            "hideFrom": { "legend": false, "tooltip": false, "viz": false }
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
           },
           "mappings": []
         },
         "overrides": []
       },
       "options": {
-        "legend": { "showLegend": false, "displayMode": "list", "placement": "bottom", "calcs": [] },
-        "tooltip": { "mode": "single", "sort": "none" }
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "targets": [
         {
           "refId": "A",
-          "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "pg_observabilidad"
+          },
           "editorMode": "code",
           "rawQuery": true,
           "format": "time_series",
@@ -402,22 +743,54 @@
     {
       "id": 9,
       "type": "table",
-      "title": "Recursos mas solicitados del portal",
-      "description": "Top 10 de URIs (se excluyen las sondas de salud del edge).",
-      "gridPos": { "h": 9, "w": 8, "x": 0, "y": 22 },
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+      "title": "Recursos mas solicitados del portal Joomla",
+      "description": "Top 10 de rutas servidas por el CMS segun su propio access log (/var/log/apache2/joomla_access.json.log).",
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 0,
+        "y": 22
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "pg_observabilidad"
+      },
       "fieldConfig": {
         "defaults": {
-          "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "filterable": false },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false
+          },
           "mappings": []
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "Peticiones" },
+            "matcher": {
+              "id": "byName",
+              "options": "Peticiones"
+            },
             "properties": [
-              { "id": "custom.cellOptions", "value": { "type": "gauge", "mode": "gradient" } },
-              { "id": "color", "value": { "mode": "fixed", "fixedColor": "#3987e5" } },
-              { "id": "custom.width", "value": 150 }
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "gradient"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#3987e5"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 150
+              }
             ]
           }
         ]
@@ -425,17 +798,32 @@
       "options": {
         "showHeader": true,
         "cellHeight": "sm",
-        "footer": { "show": false, "reducer": ["sum"], "countRows": false, "fields": "" },
-        "sortBy": [{ "displayName": "Peticiones", "desc": true }]
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "countRows": false,
+          "fields": ""
+        },
+        "sortBy": [
+          {
+            "displayName": "Peticiones",
+            "desc": true
+          }
+        ]
       },
       "targets": [
         {
           "refId": "A",
-          "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "pg_observabilidad"
+          },
           "editorMode": "code",
           "rawQuery": true,
           "format": "table",
-          "rawSql": "SELECT uri                                   AS \"Recurso\",\n       servicio                              AS \"Servicio\",\n       count(*)                              AS \"Peticiones\",\n       round(avg(duracion_s) * 1000, 1)      AS \"Latencia media (ms)\"\nFROM observabilidad.nginx_access\nWHERE $__timeFilter(\"time\")\n  AND servicio <> 'edge'\nGROUP BY 1, 2\nORDER BY 3 DESC\nLIMIT 10;"
+          "rawSql": "SELECT uri                                   AS \"Recurso\",\n       count(*)                              AS \"Peticiones\",\n       round(avg(duracion_s) * 1000, 1)      AS \"Latencia media (ms)\",\n       count(*) FILTER (WHERE status >= 400) AS \"Errores\"\nFROM observabilidad.joomla_access\nWHERE $__timeFilter(\"time\")\nGROUP BY 1\nORDER BY 2 DESC\nLIMIT 10;"
         }
       ]
     },
@@ -444,38 +832,96 @@
       "type": "table",
       "title": "Clientes mas activos",
       "description": "Top 10 de direcciones IP de origen registradas por el proxy inverso.",
-      "gridPos": { "h": 9, "w": 8, "x": 8, "y": 22 },
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 8,
+        "y": 22
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "pg_observabilidad"
+      },
       "fieldConfig": {
         "defaults": {
-          "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "filterable": false },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false
+          },
           "mappings": []
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "Peticiones" },
+            "matcher": {
+              "id": "byName",
+              "options": "Peticiones"
+            },
             "properties": [
-              { "id": "custom.cellOptions", "value": { "type": "gauge", "mode": "gradient" } },
-              { "id": "color", "value": { "mode": "fixed", "fixedColor": "#199e70" } },
-              { "id": "custom.width", "value": 140 }
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "gradient"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#199e70"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 140
+              }
             ]
           },
           {
-            "matcher": { "id": "byName", "options": "Errores" },
-            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "#d03b3b" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "Errores"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#d03b3b"
+                }
+              }
+            ]
           }
         ]
       },
       "options": {
         "showHeader": true,
         "cellHeight": "sm",
-        "footer": { "show": false, "reducer": ["sum"], "countRows": false, "fields": "" },
-        "sortBy": [{ "displayName": "Peticiones", "desc": true }]
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "countRows": false,
+          "fields": ""
+        },
+        "sortBy": [
+          {
+            "displayName": "Peticiones",
+            "desc": true
+          }
+        ]
       },
       "targets": [
         {
           "refId": "A",
-          "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "pg_observabilidad"
+          },
           "editorMode": "code",
           "rawQuery": true,
           "format": "table",
@@ -488,20 +934,52 @@
       "type": "table",
       "title": "Tablas del CMS en PostgreSQL",
       "description": "Objetos que Joomla creo en la base de datos, ordenados por tamano. Demuestra que el CMS persiste sobre PostgreSQL.",
-      "gridPos": { "h": 9, "w": 8, "x": 16, "y": 22 },
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 16,
+        "y": 22
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "pg_observabilidad"
+      },
       "fieldConfig": {
         "defaults": {
-          "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "filterable": false },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false
+          },
           "mappings": []
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "Filas" },
+            "matcher": {
+              "id": "byName",
+              "options": "Filas"
+            },
             "properties": [
-              { "id": "custom.cellOptions", "value": { "type": "gauge", "mode": "gradient" } },
-              { "id": "color", "value": { "mode": "fixed", "fixedColor": "#d95926" } },
-              { "id": "custom.width", "value": 130 }
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "gradient"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#d95926"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 130
+              }
             ]
           }
         ]
@@ -509,13 +987,23 @@
       "options": {
         "showHeader": true,
         "cellHeight": "sm",
-        "footer": { "show": false, "reducer": ["sum"], "countRows": false, "fields": "" },
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "countRows": false,
+          "fields": ""
+        },
         "sortBy": []
       },
       "targets": [
         {
           "refId": "A",
-          "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg_observabilidad" },
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "pg_observabilidad"
+          },
           "editorMode": "code",
           "rawQuery": true,
           "format": "table",
@@ -527,11 +1015,20 @@
       "id": 12,
       "type": "text",
       "title": "Como llegan estos datos hasta aqui",
-      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 31 },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 31
+      },
       "options": {
         "mode": "markdown",
-        "code": { "language": "plaintext", "showLineNumbers": false, "showMiniMap": false },
-        "content": "**Ruta del dato (sin agentes externos, solo 5 contenedores):**\n\n1. `nginx` escribe cada peticion como una linea JSON en `/var/log/nginx/shared/access.json.log`, dentro del volumen compartido `edge_logs`. `joomla` hace lo propio en `/var/log/apache2/joomla_access.json.log` (volumen `joomla_logs`).\n2. Ambos volumenes estan montados en **solo lectura** dentro del contenedor `database` (`/mnt/logs/edge` y `/mnt/logs/joomla`).\n3. En PostgreSQL, las funciones `observabilidad.leer_lineas()` y `observabilidad.leer_json()` (SECURITY DEFINER) leen la cola del archivo con `pg_read_file()` y convierten cada linea a `jsonb`, descartando lineas truncadas.\n4. Las vistas `observabilidad.nginx_access`, `observabilidad.joomla_access`, `observabilidad.actividad_bd` y `observabilidad.tablas_joomla` exponen esos datos como SQL normal.\n5. Grafana consulta esas vistas con el rol de **solo lectura** `grafana_ro` a traves del datasource aprovisionado `PostgreSQL-Observabilidad` (TCP/5432 sobre `backend_net`).\n\nDetalle completo en `INFORME.md`, seccion 1."
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "**Ruta del dato (sin agentes externos, solo 5 contenedores):**\n\n1. `nginx` escribe cada peticion como una linea JSON en `/var/log/nginx/shared/access.json.log`, dentro del volumen compartido `edge_logs`. `joomla` hace lo propio en `/var/log/apache2/joomla_access.json.log` (volumen `joomla_logs`).\n2. Ambos volumenes estan montados en **solo lectura** dentro del contenedor `database` (`/mnt/logs/edge` y `/mnt/logs/joomla`).\n3. En PostgreSQL, las funciones `observabilidad.leer_lineas()` y `observabilidad.leer_json()` (SECURITY DEFINER) leen la cola del archivo con `pg_read_file()` y convierten cada linea a `jsonb`, descartando lineas truncadas.\n4. Las vistas `observabilidad.nginx_access`, `observabilidad.joomla_access`, `observabilidad.actividad_bd` y `observabilidad.tablas_joomla` exponen esos datos como SQL normal.\n5. Grafana consulta esas vistas con el rol de **solo lectura** `grafana_ro` a traves del datasource aprovisionado `PostgreSQL-Observabilidad` (TCP/5432 sobre `backend_net`).\n\nLos contenedores se sondean entre si cada 15 s, por lo que los paneles tienen datos desde el primer minuto. Al navegar el portal en http://localhost/ las series se actualizan en el siguiente refresco (30 s).\n\nDetalle completo en `INFORME.md`, seccion 1."
       }
     }
   ]

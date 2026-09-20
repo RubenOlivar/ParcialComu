@@ -201,6 +201,7 @@ docker compose up -d --build           # reconstruir tras cambiar el Dockerfile
 | Síntoma | Causa | Solución |
 |---|---|---|
 | `bind: address already in use` al levantar | Otro servicio ocupa el puerto 80 | Editar `HTTP_PORT` en `.env` (p. ej. `HTTP_PORT=8080`) y volver a `docker compose up -d` |
+| `Pool overlaps with other one on this address space` | Otra red de Docker ya usa 172.28.x | Comentar los bloques `ipam:` de `docker-compose.yml` (Docker asignará subredes libres automáticamente) |
 | `comm_joomla` tarda en pasar a `healthy` | Instalación desatendida del CMS en curso | Esperar 1–3 min; seguir con `docker compose logs -f joomla` |
 | Grafana muestra "No data" | Aún no hay tráfico en el rango de tiempo | Ejecutar `scripts/generar_trafico.sh` o navegar el portal y usar el rango *Last 15 minutes* |
 | Jupyter abre pero el kernel no conecta | Cabeceras de WebSocket bloqueadas por un proxy externo | Revisar `proxy_set_header Upgrade` en `nginx/conf.d/default.conf` |

@@ -15,6 +15,10 @@ x-logging: &logging-default
     max-size: "10m"
     max-file: "3"
 
+# Nota: los bind-mounts llevan el sufijo 'z' (etiquetado SELinux compartido) para
+# que el despliegue funcione tal cual en hosts con SELinux activo (Fedora/RHEL).
+# En Docker Desktop, Ubuntu o Debian el indicador se ignora sin efecto alguno.
+
 services:
 
   # ===========================================================================
@@ -42,7 +46,7 @@ services:
       # Persistencia del cluster (volumen nombrado, requisito del enunciado)
       - pgdata:/var/lib/postgresql/data
       # Scripts de inicializacion: esquema de observabilidad + rol de Grafana
-      - ./database/initdb:/docker-entrypoint-initdb.d:ro
+      - ./database/initdb:/docker-entrypoint-initdb.d:ro,z
       # Logs compartidos en SOLO LECTURA: el motor los parsea y los publica
       # como vistas SQL que Grafana consulta (ver INFORME.md, seccion 1).
       - edge_logs:/mnt/logs/edge:ro
@@ -92,7 +96,7 @@ services:
       # Directorio de logs de Apache compartido con database/jupyter
       - joomla_logs:/var/log/apache2
       # Formato de log JSON + confianza en el proxy (X-Forwarded-For)
-      - ./joomla/apache/zz-observabilidad.conf:/etc/apache2/conf-enabled/zz-observabilidad.conf:ro
+      - ./joomla/apache/zz-observabilidad.conf:/etc/apache2/conf-enabled/zz-observabilidad.conf:ro,z
     networks:
       - frontend_net
       - backend_net
@@ -141,7 +145,7 @@ services:
       TZ: ${TZ:-America/Bogota}
     volumes:
       # Bind-mount del repositorio: el cuaderno queda precargado al desplegar
-      - ./jupyter/notebooks:/home/jovyan/work
+      - ./jupyter/notebooks:/home/jovyan/work:z
       # Logs crudos disponibles para procesamiento con pandas (solo lectura)
       - edge_logs:/home/jovyan/logs/edge:ro
       - joomla_logs:/home/jovyan/logs/joomla:ro
@@ -185,7 +189,7 @@ services:
       TZ: ${TZ:-America/Bogota}
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro,z
     networks:
       - frontend_net
       - backend_net
@@ -216,7 +220,7 @@ services:
     environment:
       TZ: ${TZ:-America/Bogota}
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro,z
       # Log de acceso JSON compartido con database (parseo SQL) y jupyter
       - edge_logs:/var/log/nginx/shared
     networks:
