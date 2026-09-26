@@ -20,6 +20,13 @@ USER root
 COPY config/jupyter_server_config.py /home/jovyan/.jupyter/jupyter_server_config.py
 RUN chown -R "${NB_UID}:${NB_GID}" /home/jovyan/.jupyter
 
+# Siembra de contenido de Joomla: se dispara en segundo plano al arrancar el
+# contenedor (hook antes del server) porque las tablas de Joomla no existen
+# hasta que su instalacion desatendida termina (ver seed_joomla_content.py).
+COPY seed_joomla_content.py /usr/local/bin/seed_joomla_content.py
+COPY before-notebook.d/10-seed-joomla.sh /usr/local/bin/before-notebook.d/10-seed-joomla.sh
+RUN chmod +x /usr/local/bin/before-notebook.d/10-seed-joomla.sh
+
 USER ${NB_UID}
 
 # Versiones fijadas para que el despliegue sea reproducible en cualquier maquina
