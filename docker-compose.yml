@@ -269,19 +269,20 @@ networks:
 # =============================================================================
 #  Volumenes
 #
-#  Sin "name:" explicito a proposito: Compose antepone automaticamente el
-#  nombre del proyecto (ver "name: parcial2-comunicaciones" al inicio de este
-#  archivo), generando volumenes unicos como "parcial2-comunicaciones_pgdata".
-#  Un nombre fijo y global (p.ej. "parcial2_pgdata") puede colisionar con un
-#  volumen de OTRO proyecto en la misma maquina que use el mismo nombre; en
-#  ese caso Docker reutiliza silenciosamente el volumen ajeno (solo emite un
-#  warning) en vez de crear uno vacio, y Joomla/Grafana arrancan con estado
-#  de otra instalacion (p.ej. un configuration.php que no coincide con la BD).
-#  Namespacing automatico por proyecto evita este escenario por diseno.
+#  Nombres propios del grupo (unicos): un nombre generico como "parcial2_pgdata"
+#  puede coincidir con un volumen de OTRO proyecto en la misma maquina; en ese
+#  caso Docker lo reutiliza (solo emite un warning) en vez de crear uno vacio y
+#  Joomla/Grafana arrancan con estado de otra instalacion. Con un nombre que
+#  ningun otro proyecto puede tener, siempre se crea un volumen limpio.
 # =============================================================================
 volumes:
   pgdata:          # /var/lib/postgresql/data   (persistencia del motor)
+    name: comm_umng_olivar_bernal_castilla_pgdata
   joomla_data:     # /var/www/html              (assets del CMS)
+    name: comm_umng_olivar_bernal_castilla_joomla_data
   grafana_data:    # /var/lib/grafana           (estado interno de Grafana)
+    name: comm_umng_olivar_bernal_castilla_grafana_data
   edge_logs:       # access log JSON de Nginx   (nginx rw -> database/jupyter ro)
+    name: comm_umng_olivar_bernal_castilla_edge_logs
   joomla_logs:     # /var/log/apache2 de Joomla (joomla rw -> database/jupyter ro)
+    name: comm_umng_olivar_bernal_castilla_joomla_logs
