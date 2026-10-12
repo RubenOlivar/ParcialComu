@@ -28,7 +28,7 @@ services:
   # ===========================================================================
   database:
     image: postgres:16-alpine
-    container_name: comm_database
+    container_name: comm_olivar_bernal_castilla_database
     hostname: database
     restart: unless-stopped
     logging: *logging-default
@@ -68,7 +68,7 @@ services:
   # ===========================================================================
   joomla:
     image: joomla:latest
-    container_name: comm_joomla
+    container_name: comm_olivar_bernal_castilla_joomla
     hostname: joomla
     restart: unless-stopped
     logging: *logging-default
@@ -121,7 +121,7 @@ services:
       context: ./jupyter
       dockerfile: Dockerfile
     image: parcial2-comunicaciones/jupyter-analitica:1.0
-    container_name: comm_jupyter
+    container_name: comm_olivar_bernal_castilla_jupyter
     hostname: jupyter
     restart: unless-stopped
     logging: *logging-default
@@ -164,7 +164,7 @@ services:
   # ===========================================================================
   grafana:
     image: grafana/grafana:latest
-    container_name: comm_grafana
+    container_name: comm_olivar_bernal_castilla_grafana
     hostname: grafana
     restart: unless-stopped
     logging: *logging-default
@@ -215,7 +215,7 @@ services:
   # ===========================================================================
   nginx:
     image: nginx:alpine
-    container_name: comm_nginx
+    container_name: comm_olivar_bernal_castilla_nginx
     hostname: nginx
     restart: unless-stopped
     logging: *logging-default

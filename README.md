@@ -53,11 +53,11 @@ El despliegue está listo cuando los cinco contenedores aparecen en estado
 
 ```
 NAME            IMAGE                                          STATUS
-comm_database   postgres:16-alpine                             Up (healthy)
-comm_joomla     joomla:latest                                  Up (healthy)
-comm_jupyter    parcial2-comunicaciones/jupyter-analitica:1.0   Up (healthy)
-comm_grafana    grafana/grafana:latest                         Up (healthy)
-comm_nginx      nginx:alpine                                   Up (healthy)
+comm_olivar_bernal_castilla_database   postgres:16-alpine                             Up (healthy)
+comm_olivar_bernal_castilla_joomla     joomla:latest                                  Up (healthy)
+comm_olivar_bernal_castilla_jupyter    parcial2-comunicaciones/jupyter-analitica:1.0   Up (healthy)
+comm_olivar_bernal_castilla_grafana    grafana/grafana:latest                         Up (healthy)
+comm_olivar_bernal_castilla_nginx      nginx:alpine                                   Up (healthy)
 ```
 
 ---
@@ -207,7 +207,7 @@ docker compose up -d --build           # reconstruir tras cambiar el Dockerfile
 |---|---|---|
 | `bind: address already in use` / `port is already allocated` al levantar | Otro servicio o contenedor ocupa el puerto 80. Con el `.env.example` por defecto Docker usa solo el siguiente puerto libre (80-90); el real se ve en `docker compose ps` | Para fijar uno: editar `HTTP_PORT` en `.env` (p. ej. `HTTP_PORT=8080`) y volver a `docker compose up -d` |
 | `Pool overlaps with other one on this address space` | Otra red de Docker ya usa 172.28.x | Comentar los bloques `ipam:` de `docker-compose.yml` (Docker asignará subredes libres automáticamente) |
-| `comm_joomla` tarda en pasar a `healthy` | Instalación desatendida del CMS en curso | Esperar 1–3 min; seguir con `docker compose logs -f joomla` |
+| `comm_olivar_bernal_castilla_joomla` tarda en pasar a `healthy` | Instalación desatendida del CMS en curso | Esperar 1–3 min; seguir con `docker compose logs -f joomla` |
 | Grafana muestra "No data" | Aún no hay tráfico en el rango de tiempo | Ejecutar `scripts/generar_trafico.sh` o navegar el portal y usar el rango *Last 15 minutes* |
 | Jupyter abre pero el kernel no conecta | Cabeceras de WebSocket bloqueadas por un proxy externo | Revisar `proxy_set_header Upgrade` en `nginx/conf.d/default.conf` |
 | Se quiere partir de cero | Volúmenes con datos de una ejecución previa | `docker compose down -v && docker compose up -d --build` |

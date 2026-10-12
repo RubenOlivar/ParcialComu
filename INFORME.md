@@ -547,15 +547,15 @@ El aislamiento es verificable en tres niveles distintos:
 
 ```bash
 # (a) Capa 7/3 — el edge ni siquiera puede resolver el nombre
-$ docker exec comm_nginx ping -c1 database
+$ docker exec comm_olivar_bernal_castilla_nginx ping -c1 database
 ping: bad address 'database'
 
 # (b) Capa 3 — el motor no tiene ruta por defecto: solo su propio enlace
-$ docker exec comm_database ip route show
+$ docker exec comm_olivar_bernal_castilla_database ip route show
 172.28.20.0/24 dev eth0 scope link src 172.28.20.2
 
 # (c) Capa 3 — sin salida a Internet (no hay MASQUERADE para su subred)
-$ docker exec comm_database wget -q -O /dev/null http://deb.debian.org
+$ docker exec comm_olivar_bernal_castilla_database wget -q -O /dev/null http://deb.debian.org
 wget: bad address 'deb.debian.org'     (exit=1)
 ```
 
@@ -592,11 +592,11 @@ servidor que corre en el demonio. El resolvedor:
 Contraste medido en el despliegue:
 
 ```bash
-$ docker exec comm_jupyter getent hosts database nginx
+$ docker exec comm_olivar_bernal_castilla_jupyter getent hosts database nginx
 172.28.20.2     database          # jupyter está en backend_net → lo ve
 172.28.10.5     nginx             # y también en frontend_net
 
-$ docker exec comm_nginx nslookup database
+$ docker exec comm_olivar_bernal_castilla_nginx nslookup database
 ;; connection timed out; no servers could be reached     # nginx no comparte red con él
 ```
 
@@ -674,7 +674,7 @@ independiente**, y esa es la frontera física —en términos virtuales— entre
 Un contenedor multihomed como `joomla` tiene dos interfaces con MAC distintas:
 
 ```bash
-$ docker exec comm_joomla sh -c 'hostname -I; cat /sys/class/net/eth*/address'
+$ docker exec comm_olivar_bernal_castilla_joomla sh -c 'hostname -I; cat /sys/class/net/eth*/address'
 172.28.10.3 172.28.20.5
 6a:8e:20:37:c7:19      # eth0 → br-626404bc3251 (frontend)
 42:95:89:9a:0c:48      # eth1 → br-0cbca46fa54f (backend)
@@ -694,11 +694,11 @@ asociación IP↔MAC queda en caché.
 Tabla ARP real de `nginx` tras servir tráfico:
 
 ```bash
-$ docker exec comm_nginx arp -a
+$ docker exec comm_olivar_bernal_castilla_nginx arp -a
 ? (172.28.10.1) at ca:02:54:f5:98:5b [ether] on eth0                                  ← gateway (el bridge)
-comm_joomla.parcial2_frontend_net  (172.28.10.3) at 6a:8e:20:37:c7:19 [ether] on eth0
-comm_jupyter.parcial2_frontend_net (172.28.10.2) at e2:90:0e:49:c6:3f [ether] on eth0
-comm_grafana.parcial2_frontend_net (172.28.10.4) at 42:8d:2c:ea:9f:ff [ether] on eth0
+comm_olivar_bernal_castilla_joomla.parcial2_frontend_net  (172.28.10.3) at 6a:8e:20:37:c7:19 [ether] on eth0
+comm_olivar_bernal_castilla_jupyter.parcial2_frontend_net (172.28.10.2) at e2:90:0e:49:c6:3f [ether] on eth0
+comm_olivar_bernal_castilla_grafana.parcial2_frontend_net (172.28.10.4) at 42:8d:2c:ea:9f:ff [ether] on eth0
 ```
 
 Tres observaciones:
@@ -744,14 +744,14 @@ docker compose ps
 
 ```
 NAME            STATUS
-comm_database   Up (healthy)
-comm_joomla     Up (healthy)
-comm_jupyter    Up (healthy)
-comm_grafana    Up (healthy)
-comm_nginx      Up (healthy)
+comm_olivar_bernal_castilla_database   Up (healthy)
+comm_olivar_bernal_castilla_joomla     Up (healthy)
+comm_olivar_bernal_castilla_jupyter    Up (healthy)
+comm_olivar_bernal_castilla_grafana    Up (healthy)
+comm_olivar_bernal_castilla_nginx      Up (healthy)
 ```
 
-> La primera vez, `comm_joomla` tarda 1–3 minutos en ponerse `healthy` porque
+> La primera vez, `comm_olivar_bernal_castilla_joomla` tarda 1–3 minutos en ponerse `healthy` porque
 > instala el CMS de forma desatendida. `docker compose logs -f joomla` debe
 > terminar mostrando `[OK] Joomla has been installed`.
 
